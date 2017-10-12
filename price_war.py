@@ -8,8 +8,18 @@ from credentials import *
 #2-Factor Code File
 from get_code import *
 
+def two_factor():
+    print("[*] Collecting second-factor authentication code...please wait...")
+    time.sleep(10)
+    #import pdb; pdb.set_trace()
+    security_code = return_amazon_code()
+    code_box = driver.find_element_by_name("otpCode")
+    code_box.send_keys(security_code)
+    time.sleep(5)
+    code_box.send_keys(Keys.RETURN)
+    time.sleep(7)
 
-def login():
+def login(second_factor=False):
     url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
     driver.get(url)
 
@@ -25,10 +35,14 @@ def login():
         time.sleep(15)
         password.send_keys(Keys.RETURN)
 
-        import pdb; pdb.set_trace()
-        #TODO, make 2-factor code insert into web
-        time.sleep(7)
-        print(return_amazon_code())
+        print(second_factor)
+        
+        if second_factor is False:
+            print("passing second_factor")
+            pass
+        else:
+            print("trying second factor")
+            two_factor()
 
     except:
         #Captcha Catch
@@ -119,13 +133,14 @@ def price_war():
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--time", default=900, type=float, help="time in seconds")
+    parser.add_argument("-s", "--second_factor", default=False, type=bool, help="enter 2-factor code")
     args = parser.parse_args()
 
     def deploy_price_war():
         print("[*] DEPLOYING PRICE WAR")
 
         try:
-            login()
+            login(args.second_factor)
             price_war()
         except:
             print("[*] Error in Price War")

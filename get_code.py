@@ -27,5 +27,3 @@ def return_amazon_code():
     message = str(get_messages_for_recipient(int(get_ids_for_number("262966")))[-1])
     code = str(message.replace("Text: ", "").split(" ")[0]).replace("b'", "")
     return code
-
-print(return_amazon_code())
