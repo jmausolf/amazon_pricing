@@ -25,6 +25,7 @@ def login():
         time.sleep(15)
         password.send_keys(Keys.RETURN)
 
+        import pdb; pdb.set_trace()
         #TODO, make 2-factor code insert into web
         time.sleep(7)
         print(return_amazon_code())
