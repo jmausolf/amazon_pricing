@@ -5,6 +5,8 @@ from selenium.webdriver.common.keys import Keys
 #Your Amazon Credentials File
 from credentials import *
 
+## FUNCTIONS AND MODULES FOR SECOND FACTOR LOGIN
+
 #2-Factor Code File
 from get_code import *
 
@@ -25,7 +27,7 @@ def login(second_factor=False):
 
     try:
         #Login
-        print("Logging into Amazon seller account. The price war will begin momentarily.")
+        print("[*] Logging into Amazon seller account. The price war will begin momentarily.")
         username = driver.find_element_by_name("email")
         username.send_keys(amazon_email)
         time.sleep(5)
@@ -35,13 +37,9 @@ def login(second_factor=False):
         time.sleep(15)
         password.send_keys(Keys.RETURN)
 
-        print(second_factor)
-        
         if second_factor is False:
-            print("passing second_factor")
             pass
         else:
-            print("trying second factor")
             two_factor()
 
     except:
@@ -50,12 +48,9 @@ def login(second_factor=False):
         pass
 
 
-## USER FUNCTIONS FOR PRICE CHANGES
+## FUNCTIONS FOR PRICE CHANGES
 
-#Price Match Inventory (new)
 def match_prices(inventory_item):
-    #price_match = driver.find_elements_by_link_text("Match price")
-    #print(len(price_match))
     for link in inventory_item:
         try:
             link.click()
