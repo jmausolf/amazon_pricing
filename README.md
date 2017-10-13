@@ -18,7 +18,7 @@ It is designed to automate offering the lowest price for every item in your inve
 #### Git Clone
 
 First clone the repository in terminal:
-* `git clone https://github.com/jmausolf/amazon_pricing`
+* `git clone --recursive https://github.com/jmausolf/amazon_pricing`
 
 Change directories to enter the local repository:
 * `cd amazon_pricing`
@@ -53,3 +53,21 @@ You can adjust the timing from the command line. The default is 900 seconds (15 
 
 * Every 30 minutes: `python price_war.py -t 1800`
 * Every hour: `python price_war.py -t 3600`
+
+## Second-Factor Authentication
+
+Given the move to requiring second factor authentication with Amazon login's, the latest version of the code works with this change.
+
+### Assumptions
+
+* MAC OS with iMessages enabled. 
+* Second Factor Authentication with Amazon is set to provide a code sent my SMS message.
+
+Assuming the above, the following option will first attempt to login to Amazon, prompting the second-factor code to be texted to your devices via iMessage. Once receiving the text, the code queries your internal iMessages SQLite database, and returns the latest security code from Amazon (262966). Upon retrieving the code from your messages, it enters the code into the second-factor web-prompt and proceeds with the remaining price-war code.
+
+To use:
+
+* Default time: `python price_war.py -s True`
+* Custom time: `python price_war.py -s True -t 3600`
+
+The base code [pymessage-lite](https://github.com/mattrajca/pymessage-lite) to query messages was [forked and modified for compatibility with Python3](https://github.com/jmausolf/pymessage-lite/tree/47b349af1ce22453f3c6def4218b2de9947ab1f8). 
