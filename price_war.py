@@ -5,22 +5,42 @@ from selenium.webdriver.common.keys import Keys
 #Your Amazon Credentials File
 from credentials import *
 
+## FUNCTIONS AND MODULES FOR SECOND FACTOR LOGIN
 
-def login():
+#2-Factor Code File
+from get_code import *
+
+def two_factor():
+    print("[*] Collecting second-factor authentication code...please wait...")
+    time.sleep(10)
+    #import pdb; pdb.set_trace()
+    security_code = return_amazon_code()
+    code_box = driver.find_element_by_name("otpCode")
+    code_box.send_keys(security_code)
+    time.sleep(5)
+    code_box.send_keys(Keys.RETURN)
+    time.sleep(7)
+
+def login(second_factor=False):
     url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
     driver.get(url)
 
     try:
         #Login
-        print("Logging into Amazon seller account. The price war will begin momentarily.")
+        print("[*] Logging into Amazon seller account. The price war will begin momentarily.")
         username = driver.find_element_by_name("email")
         username.send_keys(amazon_email)
         time.sleep(5)
 
         password = driver.find_element_by_name("password")
         password.send_keys(amazon_password)
-        time.sleep(5)
+        time.sleep(15)
         password.send_keys(Keys.RETURN)
+
+        if second_factor is False:
+            pass
+        else:
+            two_factor()
 
     except:
         #Captcha Catch
@@ -28,12 +48,9 @@ def login():
         pass
 
 
-## USER FUNCTIONS FOR PRICE CHANGES
+## FUNCTIONS FOR PRICE CHANGES
 
-#Price Match Inventory (new)
 def match_prices(inventory_item):
-    #price_match = driver.find_elements_by_link_text("Match price")
-    #print(len(price_match))
     for link in inventory_item:
         try:
             link.click()
@@ -111,13 +128,14 @@ def price_war():
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--time", default=900, type=float, help="time in seconds")
+    parser.add_argument("-s", "--second_factor", default=False, type=bool, help="enter 2-factor code")
     args = parser.parse_args()
 
     def deploy_price_war():
         print("[*] DEPLOYING PRICE WAR")
 
         try:
-            login()
+            login(args.second_factor)
             price_war()
         except:
             print("[*] Error in Price War")
