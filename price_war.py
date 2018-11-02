@@ -1,4 +1,4 @@
-import selenium, time, argparse
+import selenium, time, argparse, sys
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -9,6 +9,44 @@ from credentials import *
 
 #2-Factor Code File
 from get_code import *
+
+
+def status_bar(start_val, end_val, bar_length=20, form='progress'):
+    '''
+    Specify countdown timer:: form='countdown'
+    Specify progress:: form='progress'
+    '''
+
+    #Core Progress
+    progress = float(start_val) / end_val
+    arrow = '-' * int(round(progress * bar_length-1)) + '>'
+    spaces = ' ' * (bar_length - len(arrow))
+    bar = arrow + spaces
+
+    if form == 'progress':
+        #Progress
+        completed = int(round(progress * 100))
+        out = "\rPercent: [{0}] {1}%".format(bar, completed)
+
+    elif form == 'countdown':
+        #Countdown
+        remainder = int(round(end_val - start_val))
+        out = "\rCountdown: [{0}] {1} second".format(bar, remainder)
+
+    #Updater
+    sys.stdout.write(out)
+    sys.stdout.flush()
+
+
+def countdown(seconds):
+
+    for i in range(seconds+1):
+        time.sleep(1)
+        status_bar(i, seconds, form='countdown')
+
+    sys.stdout.write('\n')
+    sys.stdout.flush()
+
 
 def two_factor():
     print("[*] Collecting second-factor authentication code...please wait...")
@@ -21,7 +59,15 @@ def two_factor():
     code_box.send_keys(Keys.RETURN)
     time.sleep(7)
 
-def login(second_factor=False):
+
+def manual_two_factor():
+    print("[*] Please enter the second-factor authentication code and submit...")
+    countdown(30)
+
+
+
+
+def login(second_factor=False, manual=False):
     url = "https://sellercentral.amazon.com/inventory/ref=id_invmgr_dnav_xx_?tbla_myitable=sort:%7B%22sortOrder%22%3A%22DESCENDING%22%2C%22sortedColumnId%22%3A%22date%22%7D;search:;pagination:1;"
     driver.get(url)
 
@@ -40,7 +86,10 @@ def login(second_factor=False):
         if second_factor is False:
             pass
         else:
-            two_factor()
+            if manual is False:
+                two_factor()
+            else:
+                manual_two_factor()
 
     except:
         #Captcha Catch
@@ -128,14 +177,15 @@ def price_war():
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--time", default=900, type=float, help="time in seconds")
-    parser.add_argument("-s", "--second_factor", default=False, type=bool, help="enter 2-factor code")
+    parser.add_argument("-s", "--second_factor", default=False, type=bool, help="2-factor authentication")
+    parser.add_argument("-m", "--manual_input", default=False, type=bool, help="manually input 2-factor code")
     args = parser.parse_args()
 
     def deploy_price_war():
         print("[*] DEPLOYING PRICE WAR")
 
         try:
-            login(args.second_factor)
+            login(args.second_factor, args.manual_input)
             price_war()
         except:
             print("[*] Error in Price War")
