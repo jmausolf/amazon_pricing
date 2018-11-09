@@ -26,12 +26,12 @@ def status_bar(start_val, end_val, bar_length=20, form='progress'):
     if form == 'progress':
         #Progress
         completed = int(round(progress * 100))
-        out = "\rPercent: [{0}] {1}%".format(bar, completed)
+        out = "\rPercent: [{0}] {1: >5}%".format(bar, completed)
 
     elif form == 'countdown':
         #Countdown
         remainder = int(round(end_val - start_val))
-        out = "\rCountdown: [{0}] {1} second".format(bar, remainder)
+        out = "\rCountdown: [{0}] {1: >5} seconds".format(bar, remainder)
 
     #Updater
     sys.stdout.write(out)
